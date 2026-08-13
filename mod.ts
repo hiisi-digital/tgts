@@ -28,6 +28,7 @@ export type {
     Capability,
     CapabilityDefinition,
     CapabilityRegistry,
+    CapabilitySet,
     Platform,
     PlatformDefinition,
     ResolveOptions,
@@ -35,8 +36,10 @@ export type {
     RuntimeName,
     RuntimeVersion,
     Target,
+    TargetDefinition,
     TargetMatchResult,
-    TargetPattern
+    TargetPattern,
+    TargetSpec
 } from "./src/types.ts";
 
 export {
