@@ -3,7 +3,6 @@
 <div align="center" style="text-align: center;">
 
 [![JSR](https://jsr.io/badges/@hiisi/tgts)](https://jsr.io/@hiisi/tgts)
-[![npm Version](https://img.shields.io/npm/v/tgts?logo=npm)](https://www.npmjs.com/package/tgts)
 [![GitHub Issues](https://img.shields.io/github/issues/hiisi-digital/tgts.svg)](https://github.com/hiisi-digital/tgts/issues)
 ![License](https://img.shields.io/github/license/hiisi-digital/tgts?color=%23009689)
 
@@ -29,11 +28,7 @@ It is intended to integrate with `@hiisi/cfg-ts` for conditional compilation, wi
 ## Installation
 
 ```bash
-# Deno
 deno add jsr:@hiisi/tgts
-
-# npm / yarn / pnpm
-npm install tgts
 ```
 
 ## Related Packages
