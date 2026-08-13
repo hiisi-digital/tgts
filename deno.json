@@ -1,6 +1,7 @@
 {
   "name": "@hiisi/tgts",
   "version": "0.1.0",
+  "description": "Target definitions and schemas for multi-target TypeScript compilation: runtimes, platforms, architectures, and capabilities.",
   "license": "MPL-2.0",
   "exports": {
     ".": "./mod.ts"
