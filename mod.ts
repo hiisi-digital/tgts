@@ -4,16 +4,20 @@
  * Target definitions for cross-runtime and cross-platform compilation.
  * Provides schemas for runtimes, platforms, architectures, and their capabilities.
  *
+ * The type definitions, predefined targets and capability constants exist. The evaluation
+ * functions are declared but not implemented and currently throw, so the example below shows
+ * the intended shape rather than working code.
+ *
  * @example
  * ```ts
- * import { targets, compose, matchesTarget, targetId } from "@hiisi/tgts";
+ * import { compose, matchesTarget, targets } from "@hiisi/tgts";
  *
- * // Use predefined targets
+ * // predefined targets
  * const nodeLinux = compose(targets.node, targets.linux, targets.x64);
  *
- * // Match against patterns
+ * // match against patterns
  * if (matchesTarget(nodeLinux, { runtime: "node", platform: "linux" })) {
- *   // Target-specific code
+ *   // target-specific code
  * }
  * ```
  */
