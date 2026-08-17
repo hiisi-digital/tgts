@@ -27,6 +27,8 @@ It is intended to integrate with `@hiisi/cfg-ts` for conditional compilation, wi
 
 ## Installation
 
+No version has been published to JSR yet, so this command does not resolve. It is the intended install once a release lands.
+
 ```bash
 deno add jsr:@hiisi/tgts
 ```
