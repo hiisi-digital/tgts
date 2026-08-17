@@ -27,31 +27,31 @@
 // =============================================================================
 
 export type {
-    Architecture,
-    ArchitectureDefinition,
-    Capability,
-    CapabilityDefinition,
-    CapabilityRegistry,
-    CapabilitySet,
-    Platform,
-    PlatformDefinition,
-    ResolveOptions,
-    RuntimeDefinition,
-    RuntimeName,
-    RuntimeVersion,
-    Target,
-    TargetDefinition,
-    TargetMatchResult,
-    TargetPattern,
-    TargetSpec
+  Architecture,
+  ArchitectureDefinition,
+  Capability,
+  CapabilityDefinition,
+  CapabilityRegistry,
+  CapabilitySet,
+  Platform,
+  PlatformDefinition,
+  ResolveOptions,
+  RuntimeDefinition,
+  RuntimeName,
+  RuntimeVersion,
+  Target,
+  TargetDefinition,
+  TargetMatchResult,
+  TargetPattern,
+  TargetSpec,
 } from "./src/types.ts";
 
 export {
-    capability,
-    CapabilityNotSupportedError,
-    InvalidTargetIdError,
-    targetId,
-    TargetNotFoundError
+  capability,
+  CapabilityNotSupportedError,
+  InvalidTargetIdError,
+  targetId,
+  TargetNotFoundError,
 } from "./src/types.ts";
 
 export type { TargetId } from "./src/types.ts";
@@ -61,22 +61,24 @@ export type { TargetId } from "./src/types.ts";
 // =============================================================================
 
 export {
-    allTargets,
-    architectures,
-    arm64, browser, bun,
-    darwin,
-    deno,
-    detectArchitecture,
-    detectCurrentTarget,
-    detectPlatform,
-    detectRuntime,
-    getTarget,
-    linux,
-    node,
-    platforms,
-    runtimes,
-    windows,
-    x64
+  allTargets,
+  architectures,
+  arm64,
+  browser,
+  bun,
+  darwin,
+  deno,
+  detectArchitecture,
+  detectCurrentTarget,
+  detectPlatform,
+  detectRuntime,
+  getTarget,
+  linux,
+  node,
+  platforms,
+  runtimes,
+  windows,
+  x64,
 } from "./src/targets.ts";
 
 // Re-export as namespace for convenience
@@ -87,13 +89,13 @@ export * as targets from "./src/targets.ts";
 // =============================================================================
 
 export {
-    createCapabilitySet,
-    getCapabilities,
-    hasAllCapabilities,
-    hasAnyCapability,
-    hasCapability,
-    missingCapabilities,
-    STANDARD_CAPABILITIES
+  createCapabilitySet,
+  getCapabilities,
+  hasAllCapabilities,
+  hasAnyCapability,
+  hasCapability,
+  missingCapabilities,
+  STANDARD_CAPABILITIES,
 } from "./src/capabilities.ts";
 
 // =============================================================================
@@ -101,11 +103,11 @@ export {
 // =============================================================================
 
 export {
-    compose,
-    decompose,
-    extend,
-    intersectCapabilities,
-    mergeCapabilities
+  compose,
+  decompose,
+  extend,
+  intersectCapabilities,
+  mergeCapabilities,
 } from "./src/compose.ts";
 
 // =============================================================================
@@ -113,11 +115,11 @@ export {
 // =============================================================================
 
 export {
-    isValidArchitecture,
-    isValidPlatform,
-    isValidRuntime,
-    parseTargetId,
-    stringifyTarget
+  isValidArchitecture,
+  isValidPlatform,
+  isValidRuntime,
+  parseTargetId,
+  stringifyTarget,
 } from "./src/parse.ts";
 
 export type { ParseResult } from "./src/parse.ts";
@@ -127,10 +129,9 @@ export type { ParseResult } from "./src/parse.ts";
 // =============================================================================
 
 export {
-    calculateSpecificity,
-    findBestMatch,
-    matchesAll,
-    matchesAny,
-    matchesTarget
+  calculateSpecificity,
+  findBestMatch,
+  matchesAll,
+  matchesAny,
+  matchesTarget,
 } from "./src/match.ts";
-
