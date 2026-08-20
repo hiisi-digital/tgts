@@ -4,16 +4,20 @@
  * Target definitions for cross-runtime and cross-platform compilation.
  * Provides schemas for runtimes, platforms, architectures, and their capabilities.
  *
+ * The type definitions, predefined targets and capability constants exist. The evaluation
+ * functions are declared but not implemented and currently throw, so the example below shows
+ * the intended shape rather than working code.
+ *
  * @example
  * ```ts
- * import { targets, compose, matchesTarget, targetId } from "@hiisi/tgts";
+ * import { compose, matchesTarget, targets } from "@hiisi/tgts";
  *
- * // Use predefined targets
+ * // predefined targets
  * const nodeLinux = compose(targets.node, targets.linux, targets.x64);
  *
- * // Match against patterns
+ * // match against patterns
  * if (matchesTarget(nodeLinux, { runtime: "node", platform: "linux" })) {
- *   // Target-specific code
+ *   // target-specific code
  * }
  * ```
  */
@@ -23,28 +27,31 @@
 // =============================================================================
 
 export type {
-    Architecture,
-    ArchitectureDefinition,
-    Capability,
-    CapabilityDefinition,
-    CapabilityRegistry,
-    Platform,
-    PlatformDefinition,
-    ResolveOptions,
-    RuntimeDefinition,
-    RuntimeName,
-    RuntimeVersion,
-    Target,
-    TargetMatchResult,
-    TargetPattern
+  Architecture,
+  ArchitectureDefinition,
+  Capability,
+  CapabilityDefinition,
+  CapabilityRegistry,
+  CapabilitySet,
+  Platform,
+  PlatformDefinition,
+  ResolveOptions,
+  RuntimeDefinition,
+  RuntimeName,
+  RuntimeVersion,
+  Target,
+  TargetDefinition,
+  TargetMatchResult,
+  TargetPattern,
+  TargetSpec,
 } from "./src/types.ts";
 
 export {
-    capability,
-    CapabilityNotSupportedError,
-    InvalidTargetIdError,
-    targetId,
-    TargetNotFoundError
+  capability,
+  CapabilityNotSupportedError,
+  InvalidTargetIdError,
+  targetId,
+  TargetNotFoundError,
 } from "./src/types.ts";
 
 export type { TargetId } from "./src/types.ts";
@@ -54,22 +61,24 @@ export type { TargetId } from "./src/types.ts";
 // =============================================================================
 
 export {
-    allTargets,
-    architectures,
-    arm64, browser, bun,
-    darwin,
-    deno,
-    detectArchitecture,
-    detectCurrentTarget,
-    detectPlatform,
-    detectRuntime,
-    getTarget,
-    linux,
-    node,
-    platforms,
-    runtimes,
-    windows,
-    x64
+  allTargets,
+  architectures,
+  arm64,
+  browser,
+  bun,
+  darwin,
+  deno,
+  detectArchitecture,
+  detectCurrentTarget,
+  detectPlatform,
+  detectRuntime,
+  getTarget,
+  linux,
+  node,
+  platforms,
+  runtimes,
+  windows,
+  x64,
 } from "./src/targets.ts";
 
 // Re-export as namespace for convenience
@@ -80,13 +89,13 @@ export * as targets from "./src/targets.ts";
 // =============================================================================
 
 export {
-    createCapabilitySet,
-    getCapabilities,
-    hasAllCapabilities,
-    hasAnyCapability,
-    hasCapability,
-    missingCapabilities,
-    STANDARD_CAPABILITIES
+  createCapabilitySet,
+  getCapabilities,
+  hasAllCapabilities,
+  hasAnyCapability,
+  hasCapability,
+  missingCapabilities,
+  STANDARD_CAPABILITIES,
 } from "./src/capabilities.ts";
 
 // =============================================================================
@@ -94,11 +103,11 @@ export {
 // =============================================================================
 
 export {
-    compose,
-    decompose,
-    extend,
-    intersectCapabilities,
-    mergeCapabilities
+  compose,
+  decompose,
+  extend,
+  intersectCapabilities,
+  mergeCapabilities,
 } from "./src/compose.ts";
 
 // =============================================================================
@@ -106,11 +115,11 @@ export {
 // =============================================================================
 
 export {
-    isValidArchitecture,
-    isValidPlatform,
-    isValidRuntime,
-    parseTargetId,
-    stringifyTarget
+  isValidArchitecture,
+  isValidPlatform,
+  isValidRuntime,
+  parseTargetId,
+  stringifyTarget,
 } from "./src/parse.ts";
 
 export type { ParseResult } from "./src/parse.ts";
@@ -120,10 +129,9 @@ export type { ParseResult } from "./src/parse.ts";
 // =============================================================================
 
 export {
-    calculateSpecificity,
-    findBestMatch,
-    matchesAll,
-    matchesAny,
-    matchesTarget
+  calculateSpecificity,
+  findBestMatch,
+  matchesAll,
+  matchesAny,
+  matchesTarget,
 } from "./src/match.ts";
-

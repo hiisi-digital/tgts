@@ -101,6 +101,36 @@ export interface Target {
 }
 
 /**
+ * One building block of a target: a runtime, a platform, an architecture, or a bundle of
+ * capabilities. The predefined targets in `targets.ts` are these, and `compose` merges
+ * several of them into a single {@link Target}.
+ *
+ * Unlike {@link Target}, the runtime, platform and architecture are the plain names rather
+ * than their full definitions, and the id is an ordinary string: a definition is an input to
+ * composition, not a composed result.
+ */
+export interface TargetDefinition {
+  /** Identifier for this building block, for example "node" or "x64" */
+  readonly id: string;
+  /** The runtime this block contributes, if any */
+  readonly runtime?: RuntimeName;
+  /** The platform this block contributes, if any */
+  readonly platform?: Platform;
+  /** The architecture this block contributes, if any */
+  readonly architecture?: Architecture;
+  /** Capabilities this block contributes */
+  readonly capabilities: readonly Capability[];
+  /** Human-readable description */
+  readonly description?: string;
+}
+
+/**
+ * What {@link compose} accepts. Each spec contributes part of the resulting target, with
+ * later specs overriding earlier ones where they conflict.
+ */
+export type TargetSpec = TargetDefinition;
+
+/**
  * A pattern for matching targets.
  * Supports wildcards and partial matching.
  */
@@ -146,6 +176,11 @@ export interface CapabilityDefinition {
   /** Whether this capability is experimental */
   readonly experimental?: boolean;
 }
+
+/**
+ * An unordered collection of capabilities, as carried by a target or required by a check.
+ */
+export type CapabilitySet = ReadonlySet<Capability>;
 
 /**
  * Mapping of capabilities to targets that support them.
