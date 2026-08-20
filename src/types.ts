@@ -78,8 +78,17 @@ export type TargetId = string & { readonly __brand: unique symbol };
  * TODO: Add validation for proper target format
  */
 export function targetId(id: string): TargetId {
-  // TODO: Validate format
-  return id as TargetId;
+  const trimmed = id.trim();
+  if (trimmed === "") {
+    throw new InvalidTargetIdError(id, "a target id cannot be empty");
+  }
+  if (!/^[a-z0-9]+(-[a-z0-9]+){0,2}$/.test(trimmed)) {
+    throw new InvalidTargetIdError(
+      id,
+      "expected runtime[-platform[-arch]] in lowercase alphanumerics",
+    );
+  }
+  return trimmed as TargetId;
 }
 
 /**
@@ -159,8 +168,19 @@ export type Capability = string & { readonly __capabilityBrand: unique symbol };
  * Creates a branded Capability from a string.
  */
 export function capability(name: string): Capability {
-  // TODO: Validate format
-  return name as Capability;
+  const trimmed = name.trim();
+  if (trimmed === "") {
+    throw new TypeError("a capability name cannot be empty");
+  }
+  // Dots separate a capability from its parent, which is what makes `fs.read`
+  // imply `fs` in hasCapability. Anything else would make that relation
+  // ambiguous, so the shape is enforced at construction.
+  if (!/^[a-z0-9]+(\.[a-z0-9]+)*$/.test(trimmed)) {
+    throw new TypeError(
+      `capability "${name}" is not lowercase dot-separated alphanumerics`,
+    );
+  }
+  return trimmed as Capability;
 }
 
 /**

@@ -7,129 +7,142 @@
  * @module
  */
 
+import { capability } from "./types.ts";
 import type { Capability, CapabilitySet, Target } from "./types.ts";
 
 /**
  * Standard capability identifiers
  *
- * TODO: Expand this list based on common runtime differences
+ * These are the coarse ones, and they are deliberately coarse: a build tool
+ * asking "can this target touch the filesystem" is the common question, and a
+ * target that supports `fs` supports `fs.read` by the parent relation below.
  */
-export const STANDARD_CAPABILITIES = {
+export const STANDARD_CAPABILITIES: {
+  readonly FS: Capability;
+  readonly NET: Capability;
+  readonly ENV: Capability;
+  readonly PROCESS: Capability;
+  readonly FFI: Capability;
+  readonly WORKERS: Capability;
+  readonly WASM: Capability;
+  readonly CRYPTO: Capability;
+  readonly WEBGPU: Capability;
+  readonly DOM: Capability;
+} = {
   /** File system access */
-  FS: "fs" as Capability,
+  FS: capability("fs"),
   /** Network access */
-  NET: "net" as Capability,
+  NET: capability("net"),
   /** Environment variable access */
-  ENV: "env" as Capability,
+  ENV: capability("env"),
   /** Process/subprocess spawning */
-  PROCESS: "process" as Capability,
+  PROCESS: capability("process"),
   /** FFI/native bindings */
-  FFI: "ffi" as Capability,
+  FFI: capability("ffi"),
   /** Worker threads */
-  WORKERS: "workers" as Capability,
+  WORKERS: capability("workers"),
   /** WebAssembly */
-  WASM: "wasm" as Capability,
+  WASM: capability("wasm"),
   /** Crypto APIs */
-  CRYPTO: "crypto" as Capability,
+  CRYPTO: capability("crypto"),
   /** WebGPU */
-  WEBGPU: "webgpu" as Capability,
+  WEBGPU: capability("webgpu"),
   /** DOM access (browser only) */
-  DOM: "dom" as Capability,
+  DOM: capability("dom"),
 } as const;
 
 /**
- * Creates a new capability set
+ * Creates a new capability set.
  *
- * TODO: Implement as immutable set
+ * A `ReadonlySet` deduplicates by construction, which is the whole requirement:
+ * capabilities are an unordered collection and holding one twice means nothing.
+ *
+ * @param capabilities - The capabilities to include
+ * @returns An immutable set of the given capabilities
  */
-export function createCapabilitySet(..._capabilities: Capability[]): CapabilitySet {
-  // TODO: Create Set from capabilities
-  // TODO: Deduplicate
-  // TODO: Return frozen set
-  throw new Error("Not implemented: createCapabilitySet");
+export function createCapabilitySet(...capabilities: Capability[]): CapabilitySet {
+  return new Set(capabilities) as CapabilitySet;
 }
 
 /**
- * Gets the capabilities for a target
+ * Gets the capabilities for a target.
  *
- * TODO: Look up predefined capabilities based on target runtime/platform
- * TODO: Allow capability overrides per target
+ * Reads what the target carries rather than inferring from its runtime: a target
+ * is composed from definitions that each contribute capabilities, so by the time
+ * one exists the question has already been answered. Inferring here as well
+ * would give two sources for one fact.
  *
  * @param target - The target to get capabilities for
  * @returns Set of capabilities the target supports
  */
-export function getCapabilities(_target: Target): CapabilitySet {
-  // TODO: Look up capabilities based on target.runtime
-  // TODO: Merge with platform-specific capabilities
-  // TODO: Return combined capability set
-  throw new Error("Not implemented: getCapabilities");
+export function getCapabilities(target: Target): CapabilitySet {
+  return new Set(target.capabilities) as CapabilitySet;
 }
 
 /**
- * Checks if a target has a specific capability
+ * Whether a target supports a capability.
  *
- * TODO: Implement capability lookup
+ * A capability implies its ancestors, so a target carrying `fs.read` answers yes
+ * to `fs`. The relation runs one way only: carrying `fs` does not answer yes to
+ * `fs.read`, because a coarse grant says nothing about which specific operation
+ * is available.
  *
  * @param target - The target to check
- * @param capability - The capability to check for
- * @returns true if the target has the capability
+ * @param wanted - The capability to look for
+ * @returns True when the target supports it
  */
-export function hasCapability(_target: Target, _capability: Capability): boolean {
-  // TODO: Get capabilities for target
-  // TODO: Check if capability is in set
-  throw new Error("Not implemented: hasCapability");
+export function hasCapability(target: Target, wanted: Capability): boolean {
+  const prefix = `${wanted}.`;
+  return target.capabilities.some((held) => held === wanted || held.startsWith(prefix));
 }
 
 /**
- * Checks if a target has all of the specified capabilities
+ * Whether a target supports every one of the given capabilities.
  *
- * TODO: Implement as conjunction of hasCapability
+ * An empty list is satisfied by any target, which is the standard reading of a
+ * universal over nothing and what makes an unconstrained pattern match.
  *
  * @param target - The target to check
- * @param capabilities - The capabilities required
- * @returns true if the target has ALL capabilities
+ * @param wanted - The capabilities that must all be present
+ * @returns True when none are missing
  */
 export function hasAllCapabilities(
-  _target: Target,
-  _capabilities: Capability[],
+  target: Target,
+  wanted: readonly Capability[],
 ): boolean {
-  // TODO: Check each capability
-  // TODO: Return true only if all are present
-  throw new Error("Not implemented: hasAllCapabilities");
+  return wanted.every((c) => hasCapability(target, c));
 }
 
 /**
- * Checks if a target has any of the specified capabilities
+ * Whether a target supports at least one of the given capabilities.
  *
- * TODO: Implement as disjunction of hasCapability
+ * An empty list is satisfied by no target, which is the standard reading of an
+ * existential over nothing.
  *
  * @param target - The target to check
- * @param capabilities - The capabilities to check for
- * @returns true if the target has ANY of the capabilities
+ * @param wanted - The capabilities to look for
+ * @returns True when at least one is present
  */
 export function hasAnyCapability(
-  _target: Target,
-  _capabilities: Capability[],
+  target: Target,
+  wanted: readonly Capability[],
 ): boolean {
-  // TODO: Check each capability
-  // TODO: Return true if at least one is present
-  throw new Error("Not implemented: hasAnyCapability");
+  return wanted.some((c) => hasCapability(target, c));
 }
 
 /**
- * Gets the difference between two capability sets
+ * The capabilities a target lacks, in the order they were asked for.
  *
- * TODO: Implement set difference
+ * Order is preserved so a caller can report the first missing one and have that
+ * match what the user wrote.
  *
- * @param required - The required capabilities
- * @param available - The available capabilities
- * @returns Capabilities in required but not in available
+ * @param target - The target to check
+ * @param wanted - The capabilities required
+ * @returns Those of `wanted` the target does not support
  */
 export function missingCapabilities(
-  _required: CapabilitySet,
-  _available: CapabilitySet,
-): Capability[] {
-  // TODO: Compute set difference
-  // TODO: Return missing capabilities as array
-  throw new Error("Not implemented: missingCapabilities");
+  target: Target,
+  wanted: readonly Capability[],
+): readonly Capability[] {
+  return wanted.filter((c) => !hasCapability(target, c));
 }
