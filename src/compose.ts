@@ -1,105 +1,154 @@
 /**
- * Target composition utilities
+ * Target composition
  *
- * Provides functions to compose multiple target specifications into a single
- * combined target, merge capabilities, and decompose targets back into
- * their constituent parts.
+ * Builds a full target out of the building blocks in `targets.ts`: a runtime, a
+ * platform, an architecture, and whatever capabilities each contributes.
  *
  * @module
  */
 
+import { stringifyTarget } from "./parse.ts";
+import { targetId } from "./types.ts";
 import type { Capability, Target, TargetSpec } from "./types.ts";
 
 /**
- * Composes multiple target specifications into a single target.
+ * Composes several specs into one target.
  *
- * @param specs - Variable number of target specifications to compose
- * @returns A new target combining all specifications
+ * Later specs win where they name the same axis, so `compose(node, bun)` is a
+ * bun target: this is the override rule the type documents, and it makes
+ * composition usable as "the defaults, then my changes".
  *
- * TODO: Implement composition logic:
- * - Merge runtime, platform, architecture from each spec
- * - Later specs override earlier ones for conflicting values
- * - Combine capabilities from all specs
- * - Validate the resulting target is coherent
+ * Capabilities are the exception. They union rather than override, because a
+ * spec contributing `ffi` is stating something the target can do, not replacing
+ * what earlier specs said it could do. Overriding there would make the order of
+ * two unrelated blocks change the answer.
  *
- * @example
- * ```ts
- * const target = compose(targets.node, targets.linux, targets.x64);
- * // Result: { runtime: "node", platform: "linux", arch: "x64", ... }
- * ```
+ * The id is derived from the composed axes rather than taken from any spec, so
+ * it always round-trips through `parseTargetId`.
+ *
+ * @param specs - The building blocks, in increasing precedence
+ * @returns The composed target
+ * @throws TypeError when no spec contributes a runtime, since a target without
+ * one cannot be built for or detected against
  */
-export function compose(..._specs: TargetSpec[]): Target {
-  // TODO: Merge specs in order
-  // TODO: Handle conflicts (later wins)
-  // TODO: Combine capabilities
-  // TODO: Validate result
-  throw new Error("Not implemented: compose");
+export function compose(...specs: TargetSpec[]): Target {
+  if (specs.length === 0) {
+    throw new TypeError("compose needs at least one spec");
+  }
+
+  let runtime: TargetSpec["runtime"];
+  let platform: TargetSpec["platform"];
+  let architecture: TargetSpec["architecture"];
+  const capabilities = new Set<Capability>();
+  const descriptions: string[] = [];
+
+  for (const spec of specs) {
+    if (spec.runtime !== undefined) runtime = spec.runtime;
+    if (spec.platform !== undefined) platform = spec.platform;
+    if (spec.architecture !== undefined) architecture = spec.architecture;
+    for (const c of spec.capabilities) capabilities.add(c);
+    if (spec.description) descriptions.push(spec.description);
+  }
+
+  if (runtime === undefined) {
+    throw new TypeError(
+      `none of the ${specs.length} specs contributes a runtime: ${
+        specs.map((s) => s.id).join(", ")
+      }`,
+    );
+  }
+
+  const partial = {
+    runtime: { name: runtime },
+    ...(platform !== undefined ? { platform: { name: platform } } : {}),
+    ...(architecture !== undefined ? { architecture: { name: architecture } } : {}),
+  };
+
+  return {
+    id: targetId(stringifyTarget({ ...partial, id: "" as Target["id"], capabilities: [] })),
+    ...partial,
+    capabilities: [...capabilities],
+    ...(descriptions.length > 0 ? { description: descriptions.join("; ") } : {}),
+  };
 }
 
 /**
- * Decomposes a target into its constituent specifications.
+ * Splits a target back into the specs it is made of.
  *
- * @param target - The target to decompose
- * @returns Array of individual target specifications
+ * One spec per axis the target carries, each holding only that axis, so
+ * `compose(...decompose(t))` gives back an equal target. Capabilities travel
+ * with the runtime spec rather than being spread across all three, because
+ * there is no way to tell after the fact which block contributed which, and
+ * inventing an attribution would be a claim the data does not support.
  *
- * TODO: Implement decomposition:
- * - Extract runtime, platform, arch as separate specs
- * - Return array of individual specs
+ * @param target - The target to split
+ * @returns Its specs, in composition order
  */
-export function decompose(_target: Target): TargetSpec[] {
-  // TODO: Extract individual components
-  // TODO: Return as array of specs
-  throw new Error("Not implemented: decompose");
+export function decompose(target: Target): TargetSpec[] {
+  const specs: TargetSpec[] = [{
+    id: target.runtime.name,
+    runtime: target.runtime.name,
+    capabilities: target.capabilities,
+  }];
+  if (target.platform) {
+    specs.push({
+      id: target.platform.name,
+      platform: target.platform.name,
+      capabilities: [],
+    });
+  }
+  if (target.architecture) {
+    specs.push({
+      id: target.architecture.name,
+      architecture: target.architecture.name,
+      capabilities: [],
+    });
+  }
+  return specs;
 }
 
 /**
- * Merges capabilities from multiple targets.
+ * The union of every target's capabilities.
  *
- * @param targets - Targets whose capabilities should be merged
- * @returns Combined set of capabilities
+ * Answers "what can be done on at least one of these", which is the question a
+ * build asks when deciding whether a code path is worth emitting at all.
  *
- * TODO: Implement capability merging:
- * - Union all capabilities
- * - Handle capability conflicts if any
+ * @param targets - The targets to merge
+ * @returns Every capability held by any of them, deduplicated
  */
-export function mergeCapabilities(..._targets: Target[]): Capability[] {
-  // TODO: Collect all capabilities
-  // TODO: Deduplicate
-  // TODO: Return merged array
-  throw new Error("Not implemented: mergeCapabilities");
+export function mergeCapabilities(...targets: Target[]): Capability[] {
+  const out = new Set<Capability>();
+  for (const t of targets) for (const c of t.capabilities) out.add(c);
+  return [...out];
 }
 
 /**
- * Intersects capabilities from multiple targets.
+ * The capabilities every target has.
  *
- * @param targets - Targets whose capabilities should be intersected
- * @returns Capabilities present in ALL targets
+ * Answers "what can be relied on across all of these", which is the question a
+ * shared code path asks. An empty input gives an empty result rather than a
+ * universal set, because there is no enumerable universe of capabilities to
+ * take the complement of.
  *
- * TODO: Implement capability intersection:
- * - Find capabilities present in all targets
- * - Return the common set
+ * @param targets - The targets to intersect
+ * @returns The capabilities present in all of them
  */
-export function intersectCapabilities(..._targets: Target[]): Capability[] {
-  // TODO: Find common capabilities
-  // TODO: Return intersection
-  throw new Error("Not implemented: intersectCapabilities");
+export function intersectCapabilities(...targets: Target[]): Capability[] {
+  if (targets.length === 0) return [];
+  const [first, ...rest] = targets;
+  return first.capabilities.filter((c) => rest.every((t) => t.capabilities.includes(c)));
 }
 
 /**
- * Extends a base target with additional specifications.
+ * Extends a target with more specs.
  *
- * @param base - The base target to extend
- * @param extensions - Additional specs to apply
- * @returns New target with extensions applied
+ * The same rule as {@link compose}: extensions override the axes they name and
+ * add to the capabilities.
  *
- * TODO: Implement extension:
- * - Start with base target
- * - Apply each extension in order
- * - Return new target (immutable)
+ * @param base - The target to start from
+ * @param extensions - What to apply on top
+ * @returns The extended target
  */
-export function extend(_base: Target, ..._extensions: TargetSpec[]): Target {
-  // TODO: Clone base
-  // TODO: Apply extensions
-  // TODO: Return new target
-  throw new Error("Not implemented: extend");
+export function extend(base: Target, ...extensions: TargetSpec[]): Target {
+  return compose(...decompose(base), ...extensions);
 }
