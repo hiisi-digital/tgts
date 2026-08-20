@@ -10,7 +10,24 @@
 /**
  * Supported JavaScript runtimes.
  */
-export type RuntimeName = "deno" | "node" | "bun" | "browser" | "cloudflare" | "edge";
+export const RUNTIMES = [
+  "deno",
+  "node",
+  "bun",
+  "browser",
+  "cloudflare",
+  "edge",
+] as const;
+
+/**
+ * A runtime this crate knows about.
+ *
+ * Derived from {@link RUNTIMES} rather than written out beside it. The list and the union
+ * used to be two declarations of the same thing in two files, with nothing tying them
+ * together, so adding a runtime to one and not the other would have left the type
+ * admitting a name every validator rejected.
+ */
+export type RuntimeName = typeof RUNTIMES[number];
 
 /**
  * Runtime version constraint.
@@ -34,7 +51,17 @@ export interface RuntimeDefinition {
 /**
  * Supported operating system platforms.
  */
-export type Platform = "darwin" | "linux" | "windows" | "android" | "ios" | "freebsd";
+export const PLATFORMS = [
+  "darwin",
+  "linux",
+  "windows",
+  "android",
+  "ios",
+  "freebsd",
+] as const;
+
+/** A platform this crate knows about. Derived from {@link PLATFORMS}. */
+export type Platform = typeof PLATFORMS[number];
 
 /**
  * Platform definition with optional version.
@@ -52,7 +79,10 @@ export interface PlatformDefinition {
 /**
  * Supported CPU architectures.
  */
-export type Architecture = "x64" | "arm64" | "arm" | "x86" | "wasm32";
+export const ARCHITECTURES = ["x64", "arm64", "arm", "x86", "wasm32"] as const;
+
+/** An architecture this crate knows about. Derived from {@link ARCHITECTURES}. */
+export type Architecture = typeof ARCHITECTURES[number];
 
 /**
  * Architecture definition.
@@ -74,20 +104,50 @@ export interface ArchitectureDefinition {
 export type TargetId = string & { readonly __brand: unique symbol };
 
 /**
- * Creates a branded TargetId from a string.
- * TODO: Add validation for proper target format
+ * Creates a branded `TargetId`, checking that it names something real.
+ *
+ * The segments are checked against the vocabularies above, not only against a shape. A
+ * brand that admits `xyz-abc` guarantees nothing beyond "it has hyphens in the right
+ * places", and this one used to: the shape check lived here and the vocabulary check lived
+ * in `parseTargetId`, so the same string was valid or invalid depending on which door it
+ * came through.
+ *
+ * @throws InvalidTargetIdError if the id is empty, has too many segments, or names a
+ * runtime, platform or architecture this crate does not know.
  */
 export function targetId(id: string): TargetId {
   const trimmed = id.trim();
   if (trimmed === "") {
     throw new InvalidTargetIdError(id, "a target id cannot be empty");
   }
-  if (!/^[a-z0-9]+(-[a-z0-9]+){0,2}$/.test(trimmed)) {
+
+  const segments = trimmed.split("-");
+  if (segments.length > 3) {
     throw new InvalidTargetIdError(
       id,
-      "expected runtime[-platform[-arch]] in lowercase alphanumerics",
+      `has ${segments.length} segments; the format is runtime[-platform][-arch]`,
     );
   }
+
+  const [runtime, ...rest] = segments;
+  if (!(RUNTIMES as readonly string[]).includes(runtime)) {
+    throw new InvalidTargetIdError(
+      id,
+      `unknown runtime "${runtime}"; expected one of ${RUNTIMES.join(", ")}`,
+    );
+  }
+
+  for (const segment of rest) {
+    const known = (PLATFORMS as readonly string[]).includes(segment) ||
+      (ARCHITECTURES as readonly string[]).includes(segment);
+    if (!known) {
+      throw new InvalidTargetIdError(
+        id,
+        `"${segment}" is neither a platform nor an architecture this crate knows`,
+      );
+    }
+  }
+
   return trimmed as TargetId;
 }
 

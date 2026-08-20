@@ -6,7 +6,7 @@
  * @module
  */
 
-import { capability, targetId } from "./types.ts";
+import { ARCHITECTURES, capability, PLATFORMS, RUNTIMES, targetId } from "./types.ts";
 import type { Architecture, Platform, RuntimeName, Target } from "./types.ts";
 
 /**
@@ -19,27 +19,11 @@ export interface ParseResult {
 }
 
 /** Every runtime name the type union admits, as a value the runtime can test against. */
-const RUNTIMES: readonly RuntimeName[] = [
-  "deno",
-  "node",
-  "bun",
-  "browser",
-  "cloudflare",
-  "edge",
-];
-
-/** Every platform the type union admits. */
-const PLATFORMS: readonly Platform[] = [
-  "darwin",
-  "linux",
-  "windows",
-  "android",
-  "ios",
-  "freebsd",
-];
-
-/** Every architecture the type union admits. */
-const ARCHITECTURES: readonly Architecture[] = ["x64", "arm64", "arm", "x86", "wasm32"];
+// The vocabularies live beside the types they define, in types.ts, and the types are
+// derived from them. They used to be restated here as arrays typed against the unions,
+// which is two declarations of one list with nothing tying them together: adding a runtime
+// to the union and not to the array would have left the type admitting a name every
+// validator here rejected.
 
 /**
  * Validates a runtime name string.

@@ -209,9 +209,46 @@ describe("parseTargetId", () => {
 describe("branded constructors", () => {
   it("accepts a well-formed id and refuses a malformed one", () => {
     assertEquals(String(targetId("node-linux-x64")), "node-linux-x64");
+    assertEquals(String(targetId("deno")), "deno");
+    assertEquals(String(targetId("bun-x64")), "bun-x64", "the platform may be left out");
     assertThrows(() => targetId(""), Error);
-    assertThrows(() => targetId("Node"), Error, "lowercase");
-    assertThrows(() => targetId("a-b-c-d"), Error);
+    assertThrows(() => targetId("a-b-c-d"), Error, "segments");
+  });
+
+  it("refuses an id that names nothing this crate knows", () => {
+    // The brand used to carry a shape check only, so `xyz-abc` produced a `TargetId` that
+    // `parseTargetId` would then reject: the same string was valid or invalid depending on
+    // which door it came through. Both check the same vocabulary now.
+    assertThrows(() => targetId("xyz"), Error, "unknown runtime");
+    assertThrows(() => targetId("Node"), Error, "unknown runtime");
+    assertThrows(() => targetId("node-nowhere"), Error, "neither a platform nor");
+    assertThrows(() => targetId("node-linux-z80"), Error, "neither a platform nor");
+  });
+
+  it("the brand and the parser agree on every id", () => {
+    // One standard, checked rather than asserted. Anything the parser accepts the brand
+    // accepts, and anything it rejects the brand rejects.
+    const candidates = [
+      "deno",
+      "node-linux",
+      "bun-darwin-arm64",
+      "browser-wasm32",
+      "",
+      "xyz",
+      "node-nowhere",
+      "a-b-c-d",
+      "Node",
+    ];
+    for (const candidate of candidates) {
+      const parsed = parseTargetId(candidate).success;
+      let branded = true;
+      try {
+        targetId(candidate);
+      } catch {
+        branded = false;
+      }
+      assertEquals(branded, parsed, `the two disagree about "${candidate}"`);
+    }
   });
 
   it("accepts a dotted capability and refuses anything else", () => {
