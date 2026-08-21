@@ -19,7 +19,7 @@ This package includes:
 - **Target types and schemas** covering runtime (`deno`, `node`, `bun`, `browser`, `cloudflare`, `edge`), platform (`darwin`, `linux`, `windows`, `android`, `ios`, `freebsd`), and architecture (`x64`, `arm64`, `arm`, `x86`, `wasm32`)
 - **Predefined targets** for the common runtimes (`deno`, `node`, `bun`, `browser`), platforms (`darwin`, `linux`, `windows`), and architectures (`x64`, `arm64`)
 - **Capability identifiers** (`STANDARD_CAPABILITIES`: fs, net, env, process, ffi, workers, wasm, crypto, webgpu, dom) plus a capability query API
-- **Composition, parsing, and matching APIs** (`compose`, `parseTargetId`, `matchesTarget`, `findBestMatch`) for combining target dimensions and matching targets against patterns
+- **Composition, parsing, resolution, and matching APIs** (`compose`, `parseTargetId`, `resolveTarget`, `matchesTarget`, `findBestMatch`) for combining target dimensions and matching targets against patterns. `parseTargetId` validates a spelling and reports the axes it found; `resolveTarget` looks those axes up and returns the target they name, capabilities included, which is what a capability pattern has to be matched against
 
 It is intended to integrate with `@hiisi/cfg-ts` for conditional compilation, with `@hiisi/otso` consuming the target definitions during builds.
 

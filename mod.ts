@@ -76,6 +76,7 @@ export {
   linux,
   node,
   platforms,
+  resolveTarget,
   runtimes,
   windows,
   x64,

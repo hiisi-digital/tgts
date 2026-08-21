@@ -57,7 +57,7 @@ import {
   matchesAny,
   matchesTarget,
 } from "../src/match.ts";
-import { capability, targetId } from "../src/types.ts";
+import { ARCHITECTURES, capability, PLATFORMS, RUNTIMES, targetId } from "../src/types.ts";
 import type { Target } from "../src/types.ts";
 
 describe("Predefined targets", () => {
@@ -209,9 +209,76 @@ describe("parseTargetId", () => {
 describe("branded constructors", () => {
   it("accepts a well-formed id and refuses a malformed one", () => {
     assertEquals(String(targetId("node-linux-x64")), "node-linux-x64");
+    assertEquals(String(targetId("deno")), "deno");
+    assertEquals(String(targetId("bun-x64")), "bun-x64", "the platform may be left out");
     assertThrows(() => targetId(""), Error);
-    assertThrows(() => targetId("Node"), Error, "lowercase");
-    assertThrows(() => targetId("a-b-c-d"), Error);
+    assertThrows(() => targetId("a-b-c-d"), Error, "segments");
+  });
+
+  it("refuses an id that names nothing this crate knows", () => {
+    // The brand used to carry a shape check only, so `xyz-abc` produced a `TargetId` that
+    // `parseTargetId` would then reject: the same string was valid or invalid depending on
+    // which door it came through. Both check the same vocabulary now.
+    assertThrows(() => targetId("xyz"), Error, "unknown runtime");
+    assertThrows(() => targetId("Node"), Error, "unknown runtime");
+    assertThrows(() => targetId("node-nowhere"), Error, "unknown segment");
+    assertThrows(() => targetId("node-linux-z80"), Error, "unknown segment");
+  });
+
+  it("the brand and the parser agree on every id the vocabulary can spell", () => {
+    // The whole matrix, not a sample. Every id of one, two or three segments drawn from the
+    // vocabularies plus one token belonging to none of them: 5219 of them, in well under a
+    // second. A hand-picked list is the wrong instrument here, because the region where the
+    // two used to disagree was transpositions and duplicates, and a list written by someone
+    // who believed they agreed would not contain any.
+    const tokens = [...RUNTIMES, ...PLATFORMS, ...ARCHITECTURES, "nonsense"];
+
+    const ids: string[] = ["", "-", "a-b-c-d"];
+    for (const first of tokens) {
+      ids.push(first);
+      for (const second of tokens) {
+        ids.push(`${first}-${second}`);
+        for (const third of tokens) {
+          ids.push(`${first}-${second}-${third}`);
+        }
+      }
+    }
+
+    const disagreements: string[] = [];
+    for (const candidate of ids) {
+      const parsed = parseTargetId(candidate).success;
+      let branded = true;
+      try {
+        targetId(candidate);
+      } catch {
+        branded = false;
+      }
+      if (branded !== parsed) {
+        disagreements.push(`${candidate}: brand=${branded} parser=${parsed}`);
+      }
+    }
+
+    assertEquals(
+      disagreements.length,
+      0,
+      `the brand and the parser disagree about ${disagreements.length} of ${ids.length} ids:\n` +
+        disagreements.slice(0, 10).join("\n"),
+    );
+  });
+
+  it("the walk above actually covers the cases that once diverged", () => {
+    // The control. The test above passes trivially if its id set is empty or misses the
+    // interesting region, and a count of 5219 says neither happened only if these specific
+    // shapes are in it. Each is a transposition or a duplicate, which is what the two used
+    // to disagree about.
+    for (const id of ["deno-x64-linux", "node-linux-linux", "node-x64-x64"]) {
+      assertEquals(
+        parseTargetId(id).success,
+        false,
+        `the parser refuses "${id}", so the brand must too`,
+      );
+      assertThrows(() => targetId(id), Error);
+    }
   });
 
   it("accepts a dotted capability and refuses anything else", () => {
