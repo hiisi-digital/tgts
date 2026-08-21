@@ -57,13 +57,7 @@ import {
   matchesAny,
   matchesTarget,
 } from "../src/match.ts";
-import {
-  ARCHITECTURES,
-  capability,
-  PLATFORMS,
-  RUNTIMES,
-  targetId,
-} from "../src/types.ts";
+import { ARCHITECTURES, capability, PLATFORMS, RUNTIMES, targetId } from "../src/types.ts";
 import type { Target } from "../src/types.ts";
 
 describe("Predefined targets", () => {

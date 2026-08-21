@@ -17,13 +17,17 @@ import {
 import type { Architecture, Platform, RuntimeName, Target } from "./types.ts";
 
 /**
- * Parse result for a target ID string
+ * What {@link parseTargetId} answers with.
+ *
+ * A discriminated union rather than one shape with two optional fields, so checking
+ * `success` narrows and a caller cannot reach for `target` on a failure or `error` on a
+ * success. The optional-fields form admitted `{ success: true }` carrying no target at all,
+ * which is a state the function never produces and every caller had to defend against with
+ * a non-null assertion.
  */
-export interface ParseResult {
-  readonly success: boolean;
-  readonly target?: Target;
-  readonly error?: string;
-}
+export type ParseResult =
+  | { readonly success: true; readonly target: Target; readonly error?: undefined }
+  | { readonly success: false; readonly target?: undefined; readonly error: string };
 
 /** Every runtime name the type union admits, as a value the runtime can test against. */
 // The vocabularies live beside the types they define, in types.ts, and the types are

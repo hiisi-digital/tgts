@@ -6,6 +6,7 @@
 
 import { STANDARD_CAPABILITIES as CAP } from "./capabilities.ts";
 import { compose } from "./compose.ts";
+import { InvalidTargetIdError, parseTargetIdParts } from "./types.ts";
 import type {
   Architecture,
   Capability,
@@ -331,5 +332,56 @@ export function detectCurrentTarget(): Target {
   const specs: TargetDefinition[] = [...runtimeSpecs()];
   if (platform) specs.push({ id: platform, platform, capabilities: [] });
   if (architecture) specs.push({ id: architecture, architecture, capabilities: [] });
+  return compose(...specs);
+}
+
+/**
+ * The full target a target id names, capabilities included.
+ *
+ * {@link parseTargetId} answers a different question. It validates the spelling and returns
+ * the axes it found, with `capabilities: []`, because parsing a string cannot know what a
+ * runtime can do. This looks each axis up among the predefined targets and composes them,
+ * so `resolveTarget("deno-linux-x64")` carries deno's capability set and
+ * `matchesTarget(resolved, { capabilities: [capability("ffi")] })` answers correctly.
+ *
+ * That distinction is worth stating because the failure is silent: matching a parsed target
+ * against a pattern with capabilities returns false for every target, including the ones
+ * that have the capability, and nothing reports why.
+ *
+ * @param id - A target id: `runtime[-platform][-arch]`.
+ * @returns The composed target.
+ * @throws InvalidTargetIdError when `id` is not a well-formed target id.
+ *
+ * @example
+ * ```ts
+ * const t = resolveTarget("deno-linux-x64");
+ * hasCapability(t, capability("webgpu")); // true
+ * ```
+ */
+export function resolveTarget(id: string): Target {
+  const parsed = parseTargetIdParts(id);
+  if (!parsed.ok) {
+    throw new InvalidTargetIdError(id, parsed.error);
+  }
+
+  const { runtime, platform, architecture } = parsed.parts;
+  const specs: TargetDefinition[] = [];
+
+  // Every axis is looked up rather than synthesised, so a target composed here carries the
+  // same capabilities as the predefined one it was named from. A missing entry falls back
+  // to a bare spec: the axis is real and known to the parser, and inventing capabilities
+  // for it would be worse than carrying none.
+  const runtimeDef = getTarget(runtime);
+  specs.push(runtimeDef ?? { id: runtime, runtime, capabilities: [] });
+
+  if (platform !== undefined) {
+    const platformDef = getTarget(platform);
+    specs.push(platformDef ?? { id: platform, platform, capabilities: [] });
+  }
+  if (architecture !== undefined) {
+    const archDef = getTarget(architecture);
+    specs.push(archDef ?? { id: architecture, architecture, capabilities: [] });
+  }
+
   return compose(...specs);
 }
