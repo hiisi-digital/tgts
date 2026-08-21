@@ -6,7 +6,14 @@
  * @module
  */
 
-import { ARCHITECTURES, capability, PLATFORMS, RUNTIMES, targetId } from "./types.ts";
+import {
+  ARCHITECTURES,
+  capability,
+  parseTargetIdParts,
+  PLATFORMS,
+  RUNTIMES,
+  targetId,
+} from "./types.ts";
 import type { Architecture, Platform, RuntimeName, Target } from "./types.ts";
 
 /**
@@ -83,64 +90,18 @@ export function isValidArchitecture(name: string): name is Architecture {
  * @returns ParseResult with target or error
  */
 export function parseTargetId(id: string): ParseResult {
-  const trimmed = id.trim();
-  if (trimmed === "") {
-    return { success: false, error: "target id is empty" };
+  // The format lives in `parseTargetIdParts`, which `targetId` also calls, so the two
+  // cannot disagree about what a valid id is. They used to each carry their own rules.
+  const parsed = parseTargetIdParts(id);
+  if (!parsed.ok) {
+    return { success: false, error: parsed.error };
   }
 
-  const parts = trimmed.split("-");
-  if (parts.length > 3) {
-    return {
-      success: false,
-      error:
-        `target id "${trimmed}" has ${parts.length} segments; the format is runtime[-platform][-arch]`,
-    };
-  }
-
-  const [runtime, ...rest] = parts;
-  if (!isValidRuntime(runtime)) {
-    return {
-      success: false,
-      error: `unknown runtime "${runtime}"; expected one of ${RUNTIMES.join(", ")}`,
-    };
-  }
-
-  let platform: Platform | undefined;
-  let architecture: Architecture | undefined;
-  for (const segment of rest) {
-    if (isValidPlatform(segment)) {
-      if (platform !== undefined) {
-        return { success: false, error: `target id "${trimmed}" names two platforms` };
-      }
-      if (architecture !== undefined) {
-        return {
-          success: false,
-          error: `in "${trimmed}" the platform must come before the architecture`,
-        };
-      }
-      platform = segment;
-    } else if (isValidArchitecture(segment)) {
-      if (architecture !== undefined) {
-        return {
-          success: false,
-          error: `target id "${trimmed}" names two architectures`,
-        };
-      }
-      architecture = segment;
-    } else {
-      return {
-        success: false,
-        error: `unknown segment "${segment}" in "${trimmed}"; expected a platform (${
-          PLATFORMS.join(", ")
-        }) or an architecture (${ARCHITECTURES.join(", ")})`,
-      };
-    }
-  }
-
+  const { runtime, platform, architecture } = parsed.parts;
   return {
     success: true,
     target: {
-      id: targetId(trimmed),
+      id: targetId(id),
       runtime: { name: runtime },
       ...(platform !== undefined ? { platform: { name: platform } } : {}),
       ...(architecture !== undefined ? { architecture: { name: architecture } } : {}),

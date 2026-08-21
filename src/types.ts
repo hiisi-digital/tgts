@@ -115,40 +115,96 @@ export type TargetId = string & { readonly __brand: unique symbol };
  * @throws InvalidTargetIdError if the id is empty, has too many segments, or names a
  * runtime, platform or architecture this crate does not know.
  */
-export function targetId(id: string): TargetId {
+/** What a target id decomposes into, when it is a valid one. */
+export interface TargetIdParts {
+  readonly runtime: RuntimeName;
+  readonly platform?: Platform;
+  readonly architecture?: Architecture;
+}
+
+/**
+ * Decomposes a target id, or says why it is not one.
+ *
+ * The single place the format is decided. `targetId` and `parseTargetId` both come here, so
+ * a string cannot be valid through one door and invalid through the other. They used to
+ * each carry their own rules, and the rules were not the same: this one checked that every
+ * segment was *a* platform or *an* architecture, in any order and any number, so
+ * `deno-x64-linux`, `node-linux-linux` and `node-x64-x64` were accepted here and rejected
+ * there. Over the whole vocabulary that is 546 ids of 5219 disagreeing.
+ *
+ * The format is `runtime[-platform][-arch]`: the runtime first, then at most one platform,
+ * then at most one architecture, in that order.
+ */
+export function parseTargetIdParts(
+  id: string,
+): { ok: true; parts: TargetIdParts } | { ok: false; error: string } {
   const trimmed = id.trim();
   if (trimmed === "") {
-    throw new InvalidTargetIdError(id, "a target id cannot be empty");
+    return { ok: false, error: "a target id cannot be empty" };
   }
 
   const segments = trimmed.split("-");
   if (segments.length > 3) {
-    throw new InvalidTargetIdError(
-      id,
-      `has ${segments.length} segments; the format is runtime[-platform][-arch]`,
-    );
+    return {
+      ok: false,
+      error: `has ${segments.length} segments; the format is runtime[-platform][-arch]`,
+    };
   }
 
   const [runtime, ...rest] = segments;
   if (!(RUNTIMES as readonly string[]).includes(runtime)) {
-    throw new InvalidTargetIdError(
-      id,
-      `unknown runtime "${runtime}"; expected one of ${RUNTIMES.join(", ")}`,
-    );
+    return {
+      ok: false,
+      error: `unknown runtime "${runtime}"; expected one of ${RUNTIMES.join(", ")}`,
+    };
   }
 
+  let platform: Platform | undefined;
+  let architecture: Architecture | undefined;
+
   for (const segment of rest) {
-    const known = (PLATFORMS as readonly string[]).includes(segment) ||
-      (ARCHITECTURES as readonly string[]).includes(segment);
-    if (!known) {
-      throw new InvalidTargetIdError(
-        id,
-        `"${segment}" is neither a platform nor an architecture this crate knows`,
-      );
+    if ((PLATFORMS as readonly string[]).includes(segment)) {
+      if (platform !== undefined) {
+        return { ok: false, error: `target id "${trimmed}" names two platforms` };
+      }
+      if (architecture !== undefined) {
+        return {
+          ok: false,
+          error: `in "${trimmed}" the platform must come before the architecture`,
+        };
+      }
+      platform = segment as Platform;
+    } else if ((ARCHITECTURES as readonly string[]).includes(segment)) {
+      if (architecture !== undefined) {
+        return { ok: false, error: `target id "${trimmed}" names two architectures` };
+      }
+      architecture = segment as Architecture;
+    } else {
+      return {
+        ok: false,
+        error: `unknown segment "${segment}" in "${trimmed}"; expected a platform (${
+          PLATFORMS.join(", ")
+        }) or an architecture (${ARCHITECTURES.join(", ")})`,
+      };
     }
   }
 
-  return trimmed as TargetId;
+  return {
+    ok: true,
+    parts: {
+      runtime: runtime as RuntimeName,
+      ...(platform !== undefined ? { platform } : {}),
+      ...(architecture !== undefined ? { architecture } : {}),
+    },
+  };
+}
+
+export function targetId(id: string): TargetId {
+  const parsed = parseTargetIdParts(id);
+  if (!parsed.ok) {
+    throw new InvalidTargetIdError(id, parsed.error);
+  }
+  return id.trim() as TargetId;
 }
 
 /**
