@@ -78,5 +78,29 @@
       "scripts/",
       ".githooks/"
     ]
+  },
+  "repository": "https://github.com/hiisi-digital/tgts",
+  "distDir": "target",
+  "dist": {
+    "node": {
+      "runtime": "node",
+      "versions": [
+        "20",
+        "22",
+        "24"
+      ],
+      "plugins": [
+        "deno-to-node"
+      ]
+    },
+    "bun": {
+      "runtime": "bun",
+      "versions": [
+        "latest"
+      ],
+      "plugins": [
+        "deno-to-bun"
+      ]
+    }
   }
 }
