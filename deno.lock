@@ -77,8 +77,26 @@
   },
   "workspace": {
     "dependencies": [
+      "jsr:@hiisi/shimp@0.1",
       "jsr:@std/assert@1",
       "jsr:@std/testing@1"
-    ]
+    ],
+    "links": {
+      "jsr:@hiisi/onlywhen@0.6.0": {
+        "dependencies": [
+          "jsr:@hiisi/tgts@0.2",
+          "jsr:@std/assert@1",
+          "jsr:@std/path@1",
+          "jsr:@std/testing@1"
+        ]
+      },
+      "jsr:@hiisi/shimp@0.1.0": {
+        "dependencies": [
+          "jsr:@hiisi/onlywhen@0.6",
+          "jsr:@std/assert@1",
+          "jsr:@std/testing@1"
+        ]
+      }
+    }
   }
 }
