@@ -1,12 +1,13 @@
 /**
  * @module @hiisi/tgts
  *
- * Target definitions for cross-runtime and cross-platform compilation.
- * Provides schemas for runtimes, platforms, architectures, and their capabilities.
+ * What a build target is, as data: which runtime, which platform, which architecture, and
+ * what that combination can actually reach for.
  *
- * The type definitions, predefined targets and capability constants exist. The evaluation
- * functions are declared but not implemented and currently throw, so the example below shows
- * the intended shape rather than working code.
+ * The axes, the predefined targets, the capability sets and the operations over them
+ * (compose, parse, resolve, match, capability queries, host detection) are all implemented.
+ * Detection refuses rather than guessing: an unrecognised platform or architecture throws,
+ * because a build that stops and says so beats one that silently picked wrong.
  *
  * @example
  * ```ts
