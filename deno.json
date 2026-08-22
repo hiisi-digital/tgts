@@ -8,7 +8,8 @@
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@^1.0.0",
-    "@std/testing": "jsr:@std/testing@^1.0.0"
+    "@std/testing": "jsr:@std/testing@^1.0.0",
+    "@hiisi/shimp": "jsr:@hiisi/shimp@^0.1.0"
   },
   "lint": {
     "include": [
@@ -102,5 +103,9 @@
         "deno-to-bun"
       ]
     }
-  }
+  },
+  "links": [
+    "../shimp",
+    "../onlywhen"
+  ]
 }
