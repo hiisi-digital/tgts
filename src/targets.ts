@@ -218,8 +218,18 @@ export function detectRuntime(): Target {
   );
 }
 
-/** Maps what each runtime calls a platform onto this module's names. */
-function normalisePlatform(raw: string): Platform | undefined {
+/**
+ * Maps what a runtime calls a platform onto this module's names.
+ *
+ * Public because this module owns the vocabulary, and anything holding a raw
+ * host string needs a way in. Without it a consumer writes its own mapping,
+ * and two mappings of the same three names is how `x86_64` and `x64` came to
+ * mean the same architecture in two packages with no conversion between them.
+ *
+ * @returns the name, or `undefined` when this module does not know it. It does
+ * not guess: an unrecognised platform is reported rather than defaulted.
+ */
+export function normalisePlatform(raw: string): Platform | undefined {
   switch (raw) {
     case "darwin":
       return "darwin";
@@ -230,6 +240,8 @@ function normalisePlatform(raw: string): Platform | undefined {
       return "windows";
     case "android":
       return "android";
+    case "ios":
+      return "ios";
     case "freebsd":
       return "freebsd";
     default:
@@ -237,8 +249,16 @@ function normalisePlatform(raw: string): Platform | undefined {
   }
 }
 
-/** Maps what each runtime calls an architecture onto this module's names. */
-function normaliseArchitecture(raw: string): Architecture | undefined {
+/**
+ * Maps what a runtime calls an architecture onto this module's names.
+ *
+ * Both spellings arrive in practice: node says `x64` and `arm64`, rust and
+ * uname say `x86_64` and `aarch64`. They are the same two architectures, and
+ * this is the only place that says so.
+ *
+ * @returns the name, or `undefined` when this module does not know it.
+ */
+export function normaliseArchitecture(raw: string): Architecture | undefined {
   switch (raw) {
     case "x86_64":
     case "x64":
@@ -248,6 +268,8 @@ function normaliseArchitecture(raw: string): Architecture | undefined {
       return "arm64";
     case "arm":
       return "arm";
+    case "wasm32":
+      return "wasm32";
     case "ia32":
     case "x86":
       return "x86";

@@ -23,6 +23,8 @@ import {
   getTarget,
   linux,
   node,
+  normaliseArchitecture,
+  normalisePlatform,
   platforms,
   runtimes,
   x64,
@@ -479,5 +481,34 @@ describe("detection", () => {
 
   it("carries the runtime's capabilities onto the detected target", () => {
     assert(hasCapability(detectCurrentTarget(), CAP.FS));
+  });
+});
+
+Deno.test("the normalisers are the one place two spellings become one name", async (t) => {
+  await t.step("both architecture spellings land on the same name", () => {
+    // node says x64/arm64, rust and uname say x86_64/aarch64. They are the same
+    // two architectures, and this module is the only thing that says so.
+    assertEquals(normaliseArchitecture("x64"), normaliseArchitecture("x86_64"));
+    assertEquals(normaliseArchitecture("arm64"), normaliseArchitecture("aarch64"));
+    assertEquals(normaliseArchitecture("x86_64"), "x64");
+    assertEquals(normaliseArchitecture("aarch64"), "arm64");
+  });
+
+  await t.step("an unknown name is reported, not guessed", () => {
+    assertEquals(normaliseArchitecture("sparc64"), undefined);
+    assertEquals(normalisePlatform("plan9"), undefined);
+  });
+
+  await t.step("every name in the catalogue normalises to itself", () => {
+    for (const a of ARCHITECTURES) assertEquals(normaliseArchitecture(a), a);
+    for (const p of PLATFORMS) assertEquals(normalisePlatform(p), p);
+  });
+
+  await t.step("win32 is not a platform name this module uses", () => {
+    // the spelling that produced a dead guard in a consumer: node answers
+    // win32, this vocabulary says windows, and nothing may quietly accept both
+    // as if they were the same string.
+    assertEquals(normalisePlatform("win32"), "windows");
+    assertEquals(PLATFORMS.includes("win32" as never), false);
   });
 });
