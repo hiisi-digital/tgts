@@ -36,35 +36,10 @@ export type ParseResult =
 // to the union and not to the array would have left the type admitting a name every
 // validator here rejected.
 
-/**
- * Validates a runtime name string.
- *
- * @param name - The runtime name to validate
- * @returns True if valid runtime name
- */
-export function isValidRuntime(name: string): name is RuntimeName {
-  return (RUNTIMES as readonly string[]).includes(name);
-}
-
-/**
- * Validates a platform name string.
- *
- * @param name - The platform name to validate
- * @returns True if valid platform name
- */
-export function isValidPlatform(name: string): name is Platform {
-  return (PLATFORMS as readonly string[]).includes(name);
-}
-
-/**
- * Validates an architecture name string.
- *
- * @param name - The architecture name to validate
- * @returns True if valid architecture name
- */
-export function isValidArchitecture(name: string): name is Architecture {
-  return (ARCHITECTURES as readonly string[]).includes(name);
-}
+// The three validity predicates live in `types.ts`, beside the tables they
+// narrow, and are re-exported here because this is where consumers have always
+// imported them from.
+export { isValidArchitecture, isValidPlatform, isValidRuntime } from "./types.ts";
 
 /**
  * Parses a target ID string into a Target object.

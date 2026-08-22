@@ -85,6 +85,31 @@ export const ARCHITECTURES = ["x64", "arm64", "arm", "x86", "wasm32"] as const;
 export type Architecture = typeof ARCHITECTURES[number];
 
 /**
+ * Whether this names a runtime this package knows.
+ *
+ * A type predicate rather than a boolean, so a caller that has asked the
+ * question gets a narrowed type out of it and needs no cast. These live beside
+ * the tables they narrow: `parse.ts` had them, and `parse.ts` imports this
+ * module, so nothing here could reach them. The result was that this file
+ * checked membership inline and then asserted the narrowing with a cast, which
+ * is the same check written twice with the compiler trusting the second one.
+ */
+export function isValidRuntime(name: string): name is RuntimeName {
+  return (RUNTIMES as readonly string[]).includes(name);
+}
+
+/** Whether this names a platform this package knows. */
+export function isValidPlatform(name: string): name is Platform {
+  return (PLATFORMS as readonly string[]).includes(name);
+}
+
+/** Whether this names an architecture this package knows. */
+export function isValidArchitecture(name: string): name is Architecture {
+  return (ARCHITECTURES as readonly string[]).includes(name);
+}
+
+
+/**
  * Architecture definition.
  */
 export interface ArchitectureDefinition {
@@ -152,7 +177,10 @@ export function parseTargetIdParts(
   }
 
   const [runtime, ...rest] = segments;
-  if (!(RUNTIMES as readonly string[]).includes(runtime)) {
+  // the predicate rather than a bare membership test, so `runtime` is narrowed
+  // for the rest of this function and the return needs no cast to say what the
+  // check already established.
+  if (runtime === undefined || !isValidRuntime(runtime)) {
     return {
       ok: false,
       error: `unknown runtime "${runtime}"; expected one of ${RUNTIMES.join(", ")}`,
@@ -163,7 +191,7 @@ export function parseTargetIdParts(
   let architecture: Architecture | undefined;
 
   for (const segment of rest) {
-    if ((PLATFORMS as readonly string[]).includes(segment)) {
+    if (isValidPlatform(segment)) {
       if (platform !== undefined) {
         return { ok: false, error: `target id "${trimmed}" names two platforms` };
       }
@@ -173,12 +201,12 @@ export function parseTargetIdParts(
           error: `in "${trimmed}" the platform must come before the architecture`,
         };
       }
-      platform = segment as Platform;
-    } else if ((ARCHITECTURES as readonly string[]).includes(segment)) {
+      platform = segment;
+    } else if (isValidArchitecture(segment)) {
       if (architecture !== undefined) {
         return { ok: false, error: `target id "${trimmed}" names two architectures` };
       }
-      architecture = segment as Architecture;
+      architecture = segment;
     } else {
       return {
         ok: false,
@@ -192,7 +220,7 @@ export function parseTargetIdParts(
   return {
     ok: true,
     parts: {
-      runtime: runtime as RuntimeName,
+      runtime,
       ...(platform !== undefined ? { platform } : {}),
       ...(architecture !== undefined ? { architecture } : {}),
     },
