@@ -86,6 +86,26 @@ export {
 // Re-export as namespace for convenience
 export * as targets from "./src/targets.ts";
 
+/**
+ * The mapping from a raw host string into this module's vocabulary.
+ *
+ * Exported because this module owns the names. Anything that reads a platform
+ * or an architecture off the host holds a raw string and needs a way in, and a
+ * second mapping written elsewhere is how one estate ends up with two spellings
+ * of one architecture.
+ */
+export { normaliseArchitecture, normalisePlatform } from "./src/targets.ts";
+
+/**
+ * The vocabulary itself, as tables.
+ *
+ * A consumer that needs to enumerate the names, validate against them or write
+ * an exhaustive test over them needs the values and not only the types. Without
+ * these it writes the list out again, which is a second copy that goes stale
+ * the moment a name is added here.
+ */
+export { ARCHITECTURES, PLATFORMS, RUNTIMES } from "./src/types.ts";
+
 // =============================================================================
 // Capabilities
 // =============================================================================
