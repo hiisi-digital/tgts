@@ -96,6 +96,16 @@ export * as targets from "./src/targets.ts";
  */
 export { normaliseArchitecture, normalisePlatform } from "./src/targets.ts";
 
+/**
+ * The vocabulary itself, as tables.
+ *
+ * A consumer that needs to enumerate the names, validate against them or write
+ * an exhaustive test over them needs the values and not only the types. Without
+ * these it writes the list out again, which is a second copy that goes stale
+ * the moment a name is added here.
+ */
+export { ARCHITECTURES, PLATFORMS, RUNTIMES } from "./src/types.ts";
+
 // =============================================================================
 // Capabilities
 // =============================================================================
