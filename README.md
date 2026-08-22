@@ -95,6 +95,9 @@ which is deliberate, but it does mean the recognised set is a list rather than a
 
 ## Installation
 
+Not published yet, so this does not resolve. It is the command once a release
+lands.
+
 ```bash
 deno add jsr:@hiisi/tgts
 ```
