@@ -43,7 +43,7 @@ const SERVER_CAPABILITIES: readonly Capability[] = [
  */
 export const deno: TargetDefinition = {
   id: "deno",
-  runtime: "deno" as RuntimeName,
+  runtime: "deno",
   capabilities: [...SERVER_CAPABILITIES, CAP.FFI, CAP.WEBGPU],
   description: "Deno, with web-standard APIs and a permissions system",
 };
@@ -56,7 +56,7 @@ export const deno: TargetDefinition = {
  */
 export const node: TargetDefinition = {
   id: "node",
-  runtime: "node" as RuntimeName,
+  runtime: "node",
   capabilities: [...SERVER_CAPABILITIES, CAP.FFI],
   description: "Node.js, with native addons for FFI",
 };
@@ -69,7 +69,7 @@ export const node: TargetDefinition = {
  */
 export const bun: TargetDefinition = {
   id: "bun",
-  runtime: "bun" as RuntimeName,
+  runtime: "bun",
   capabilities: [...SERVER_CAPABILITIES, CAP.FFI],
   description: "Bun, Node-compatible with its own FFI",
 };
@@ -83,7 +83,7 @@ export const bun: TargetDefinition = {
  */
 export const browser: TargetDefinition = {
   id: "browser",
-  runtime: "browser" as RuntimeName,
+  runtime: "browser",
   capabilities: [CAP.NET, CAP.WORKERS, CAP.WASM, CAP.CRYPTO, CAP.WEBGPU, CAP.DOM],
   description: "A browser, with no filesystem, environment or subprocesses",
 };
@@ -95,7 +95,7 @@ export const browser: TargetDefinition = {
 /** macOS platform target. */
 export const darwin: TargetDefinition = {
   id: "darwin",
-  platform: "darwin" as Platform,
+  platform: "darwin",
   capabilities: [],
   description: "macOS",
 };
@@ -103,7 +103,7 @@ export const darwin: TargetDefinition = {
 /** Linux platform target. */
 export const linux: TargetDefinition = {
   id: "linux",
-  platform: "linux" as Platform,
+  platform: "linux",
   capabilities: [],
   description: "Linux",
 };
@@ -111,7 +111,7 @@ export const linux: TargetDefinition = {
 /** Windows platform target. */
 export const windows: TargetDefinition = {
   id: "windows",
-  platform: "windows" as Platform,
+  platform: "windows",
   capabilities: [],
   description: "Windows",
 };
@@ -123,7 +123,7 @@ export const windows: TargetDefinition = {
 /** x64 (AMD64) architecture target. */
 export const x64: TargetDefinition = {
   id: "x64",
-  architecture: "x64" as Architecture,
+  architecture: "x64",
   capabilities: [],
   description: "x86-64",
 };
@@ -131,7 +131,7 @@ export const x64: TargetDefinition = {
 /** ARM64 (aarch64) architecture target. */
 export const arm64: TargetDefinition = {
   id: "arm64",
-  architecture: "arm64" as Architecture,
+  architecture: "arm64",
   capabilities: [],
   description: "ARM64",
 };
