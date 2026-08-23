@@ -141,6 +141,10 @@ export type TargetId = string & { readonly __brand: unique symbol };
  * runtime, platform or architecture this crate does not know.
  */
 /** What a target id decomposes into, when it is a valid one. */
+/** How a malformed id is described, so the messages below cannot drift apart. */
+const namesTwice = (id: string, axis: string): string =>
+  `target id "${id}" names two ${axis}s`;
+
 interface TargetIdParts {
   readonly runtime: RuntimeName;
   readonly platform?: Platform;
@@ -193,7 +197,7 @@ export function parseTargetIdParts(
   for (const segment of rest) {
     if (isValidPlatform(segment)) {
       if (platform !== undefined) {
-        return { ok: false, error: `target id "${trimmed}" names two platforms` };
+        return { ok: false, error: namesTwice(trimmed, "platform") };
       }
       if (architecture !== undefined) {
         return {
@@ -204,7 +208,7 @@ export function parseTargetIdParts(
       platform = segment;
     } else if (isValidArchitecture(segment)) {
       if (architecture !== undefined) {
-        return { ok: false, error: `target id "${trimmed}" names two architectures` };
+        return { ok: false, error: namesTwice(trimmed, "architecture") };
       }
       architecture = segment;
     } else {

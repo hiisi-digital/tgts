@@ -24,4 +24,15 @@ export default viola()
   .rule(report.error, when.in("tests/**/*.ts"))
   // the compile-fail fixtures are supposed to be wrong. that is their entire
   // job, so the linters have nothing useful to say about them.
-  .rule(report.off, when.in("tests/compile_fail/**"));
+  .rule(report.off, when.in("tests/compile_fail/**"))
+  // `parseTargetId` and `parseTargetIdParts` are 74% alike by name and the
+  // lint asks for a review rather than asserting a fault. Reviewed: one gives
+  // back a branded id and the other the axes it is spelled from, the names say
+  // which is which, and shortening either would say less.
+  .set("similar-functions", { ignoreFunctions: [
+      // .set replaces rather than merges, so the default that excludes
+      // constructors has to be restated or it comes back.
+      "constructor",
+      "parseTargetId",
+      "parseTargetIdParts",
+    ] });
