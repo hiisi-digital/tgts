@@ -14,9 +14,12 @@
  * @module
  */
 
-import { assert } from "@std/assert";
+import { assert, assertEquals, assertThrows } from "@std/assert";
 
 import { allTargets } from "../src/targets.ts";
+import { compose } from "../src/compose.ts";
+import { stringifyTarget } from "../src/parse.ts";
+import { targetId } from "../src/types.ts";
 import { ARCHITECTURES, PLATFORMS, RUNTIMES } from "../src/types.ts";
 
 const targets = allTargets;
@@ -79,4 +82,26 @@ Deno.test("every target's architecture is an architecture this package knows", (
       }`,
     );
   }
+});
+
+Deno.test("compose mints an id through the validating constructor", () => {
+  // this pins the fix for a cast that used to sit in compose: spelling a target
+  // needed a whole Target, so the one caller whose job is to compute the id had
+  // to fabricate one as `"" as Target["id"]`. stringifyTarget now asks for the
+  // three axes it actually reads, so there is nothing left to fabricate.
+  //
+  // the law is that the id compose produces round-trips through targetId, which
+  // throws on anything it did not build. a fabricated brand would not.
+  const composed = compose(
+    { id: "r", runtime: "deno", capabilities: [] },
+    { id: "p", platform: "linux", capabilities: [] },
+  );
+  assertEquals(composed.id, targetId("deno-linux"));
+  assertEquals(stringifyTarget(composed), "deno-linux");
+});
+
+Deno.test("the validating constructor refuses what it did not build", () => {
+  // the control: without this, the law above would pass against a targetId that
+  // branded anything handed to it, which is what a cast does.
+  assertThrows(() => targetId("not a target at all"));
 });

@@ -101,7 +101,19 @@ export function parseTargetId(id: string): ParseResult {
  * @param target - The target to render
  * @returns The canonical target ID string
  */
-export function stringifyTarget(target: Target): string {
+/**
+ * The axes a target's name is spelled from.
+ *
+ * Naming this is what removes a cast rather than relocating one. Spelling a
+ * target reads three axis names and nothing else, so asking for a whole
+ * `Target` demanded an `id` from the one caller whose reason for calling is to
+ * compute that id. It supplied `"" as Target["id"]`, which is the fabricated
+ * brand this package's own compile-fail fixture names as the hole it cannot
+ * close from outside.
+ */
+export type TargetAxes = Pick<Target, "runtime" | "platform" | "architecture">;
+
+export function stringifyTarget(target: TargetAxes): string {
   const parts: string[] = [target.runtime.name];
   if (target.platform) parts.push(target.platform.name);
   if (target.architecture) parts.push(target.architecture.name);

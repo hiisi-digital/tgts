@@ -65,7 +65,7 @@ export function compose(...specs: TargetSpec[]): Target {
   };
 
   return {
-    id: targetId(stringifyTarget({ ...partial, id: "" as Target["id"], capabilities: [] })),
+    id: targetId(stringifyTarget(partial)),
     ...partial,
     capabilities: [...capabilities],
     ...(descriptions.length > 0 ? { description: descriptions.join("; ") } : {}),
