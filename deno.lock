@@ -1,39 +1,48 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@hiisi/flash-freeze@0.1.1-alpha.1": "0.1.1-alpha.1",
-    "jsr:@hiisi/viola-cli@0.3.0-alpha.2": "0.3.0-alpha.2",
-    "jsr:@hiisi/viola@0.3.0-alpha.7": "0.3.0-alpha.7",
+    "jsr:@hiisi/flash-freeze@~0.1.1": "0.1.1",
+    "jsr:@hiisi/viola-default-lints@~0.3.1": "0.3.1",
+    "jsr:@hiisi/viola-grammar-ts@~0.3.1": "0.3.1",
+    "jsr:@hiisi/viola@0.3": "0.3.1",
+    "jsr:@hiisi/viola@~0.3.1": "0.3.1",
     "jsr:@std/assert@1": "1.0.19",
     "jsr:@std/assert@^1.0.19": "1.0.19",
-    "jsr:@std/cli@1": "1.0.32",
+    "jsr:@std/async@^1.5.0": "1.5.0",
+    "jsr:@std/data-structures@^1.1.2": "1.1.2",
     "jsr:@std/fs@1": "1.0.24",
+    "jsr:@std/fs@^1.0.24": "1.0.24",
     "jsr:@std/internal@^1.0.12": "1.0.14",
     "jsr:@std/internal@^1.0.14": "1.0.14",
     "jsr:@std/path@1": "1.1.6",
     "jsr:@std/path@^1.1.5": "1.1.6",
+    "jsr:@std/path@^1.1.6": "1.1.6",
     "jsr:@std/testing@1": "1.0.20",
     "npm:web-tree-sitter@0.22.6": "0.22.6"
   },
   "jsr": {
-    "@hiisi/flash-freeze@0.1.1-alpha.1": {
-      "integrity": "f431970528bacc17ecacce880eec8c824fcf737e04021043c904fd21eb97f490"
+    "@hiisi/flash-freeze@0.1.1": {
+      "integrity": "d47a7143f8f0497101b62faf466574577383add61960265d8fc3323f3c77c512"
     },
-    "@hiisi/viola@0.3.0-alpha.7": {
-      "integrity": "3002d8c61e452bb482074be76f6726a3ccd3290fee7853f9d877680311a3e552",
+    "@hiisi/viola@0.3.1": {
+      "integrity": "bfb2791c9037079de49494ff37f10d042ece94b99e0f173982fa5381a1e419af",
       "dependencies": [
         "jsr:@hiisi/flash-freeze",
-        "jsr:@std/fs",
+        "jsr:@std/fs@1",
         "jsr:@std/path@1",
         "npm:web-tree-sitter"
       ]
     },
-    "@hiisi/viola-cli@0.3.0-alpha.2": {
-      "integrity": "55a75903e0fd7febdfc8e50ed90e2f6bd47a1330c9145709b4cf7b2ed4a3aa18",
+    "@hiisi/viola-default-lints@0.3.1": {
+      "integrity": "70f6600a034c98ef9f6c09c9098c1494711102ae98656b63aeca45b5d83459f9",
       "dependencies": [
-        "jsr:@hiisi/viola",
-        "jsr:@std/cli",
-        "jsr:@std/path@1"
+        "jsr:@hiisi/viola@0.3"
+      ]
+    },
+    "@hiisi/viola-grammar-ts@0.3.1": {
+      "integrity": "3505507af9fa619975c0d41127ec1a071c6f939093d4f8c87c85c699ea3e8eb5",
+      "dependencies": [
+        "jsr:@hiisi/viola@0.3"
       ]
     },
     "@std/assert@1.0.19": {
@@ -42,8 +51,11 @@
         "jsr:@std/internal@^1.0.12"
       ]
     },
-    "@std/cli@1.0.32": {
-      "integrity": "188b3a100d6202d64e3f5bd3d799c7fa4f6d77f92cc65eb7f641c1fa0aa92a66"
+    "@std/async@1.5.0": {
+      "integrity": "4c1f22d287a17ad7d8643b1952bc5a4d21e5d8b68dc8c20d8268eecc69096e82"
+    },
+    "@std/data-structures@1.1.2": {
+      "integrity": "2471377c9e0051f9ec34e57d0ebd0ad133a5a889677446ec6ba9938e4e102918"
     },
     "@std/fs@1.0.24": {
       "integrity": "f3061b45b81673a2bece689da041df32d174be064c89eb6397fb5718d3fb7877",
@@ -64,7 +76,11 @@
       "integrity": "21380ed438672762e4ec549cbf4fe41c5b68f5598773a30b64abe7375513e721",
       "dependencies": [
         "jsr:@std/assert@^1.0.19",
-        "jsr:@std/internal@^1.0.14"
+        "jsr:@std/async",
+        "jsr:@std/data-structures",
+        "jsr:@std/fs@^1.0.24",
+        "jsr:@std/internal@^1.0.14",
+        "jsr:@std/path@^1.1.6"
       ]
     }
   },
@@ -75,10 +91,10 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@hiisi/flash-freeze@0.1.1-alpha.1",
-      "jsr:@hiisi/viola-default-lints@0.3.0-alpha.3",
-      "jsr:@hiisi/viola-grammar-ts@0.3.0-alpha.3",
-      "jsr:@hiisi/viola@0.3.0-alpha.7",
+      "jsr:@hiisi/flash-freeze@~0.1.1",
+      "jsr:@hiisi/viola-default-lints@~0.3.1",
+      "jsr:@hiisi/viola-grammar-ts@~0.3.1",
+      "jsr:@hiisi/viola@~0.3.1",
       "jsr:@std/assert@1",
       "jsr:@std/testing@1"
     ]
