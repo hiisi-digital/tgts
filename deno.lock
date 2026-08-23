@@ -27,49 +27,12 @@
   },
   "workspace": {
     "dependencies": [
+      "jsr:@hiisi/flash-freeze@0.1.1-alpha.1",
+      "jsr:@hiisi/viola-default-lints@0.3.0-alpha.3",
+      "jsr:@hiisi/viola-grammar-ts@0.3.0-alpha.3",
+      "jsr:@hiisi/viola@0.3.0-alpha.7",
       "jsr:@std/assert@1",
       "jsr:@std/testing@1"
-<<<<<<< Updated upstream
     ]
-||||||| Stash base
-    ],
-    "links": {
-      "jsr:@hiisi/onlywhen@0.7.0": {
-        "dependencies": [
-          "jsr:@hiisi/tgts@0.2",
-          "jsr:@std/assert@1",
-          "jsr:@std/path@1",
-          "jsr:@std/testing@1"
-        ]
-      },
-      "jsr:@hiisi/shimp@0.1.0": {
-        "dependencies": [
-          "jsr:@hiisi/onlywhen@0.7",
-          "jsr:@std/assert@1",
-          "jsr:@std/testing@1"
-        ]
-      }
-    }
-=======
-    ],
-    "links": {
-      "jsr:@hiisi/onlywhen@0.7.0": {
-        "dependencies": [
-          "jsr:@hiisi/tgts@0.2",
-          "jsr:@std/assert@1",
-          "jsr:@std/path@1",
-          "jsr:@std/testing@1"
-        ]
-      },
-      "jsr:@hiisi/shimp@0.1.0": {
-        "dependencies": [
-          "jsr:@hiisi/cfg-ts@0.1",
-          "jsr:@hiisi/onlywhen@0.7",
-          "jsr:@std/assert@1",
-          "jsr:@std/testing@1"
-        ]
-      }
-    }
->>>>>>> Stashed changes
   }
 }
