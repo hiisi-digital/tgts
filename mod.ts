@@ -144,7 +144,7 @@ export {
   stringifyTarget,
 } from "./src/parse.ts";
 
-export type { ParseResult } from "./src/parse.ts";
+export type { ParseResult, TargetAxes } from "./src/types.ts";
 
 // =============================================================================
 // Matching

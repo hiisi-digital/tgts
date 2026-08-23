@@ -6,28 +6,8 @@
  * @module
  */
 
-import {
-  ARCHITECTURES,
-  capability,
-  parseTargetIdParts,
-  PLATFORMS,
-  RUNTIMES,
-  targetId,
-} from "./types.ts";
-import type { Architecture, Platform, RuntimeName, Target } from "./types.ts";
-
-/**
- * What {@link parseTargetId} answers with.
- *
- * A discriminated union rather than one shape with two optional fields, so checking
- * `success` narrows and a caller cannot reach for `target` on a failure or `error` on a
- * success. The optional-fields form admitted `{ success: true }` carrying no target at all,
- * which is a state the function never produces and every caller had to defend against with
- * a non-null assertion.
- */
-export type ParseResult =
-  | { readonly success: true; readonly target: Target; readonly error?: undefined }
-  | { readonly success: false; readonly target?: undefined; readonly error: string };
+import { parseTargetIdParts, targetId } from "./types.ts";
+import type { ParseResult, TargetAxes } from "./types.ts";
 
 /** Every runtime name the type union admits, as a value the runtime can test against. */
 // The vocabularies live beside the types they define, in types.ts, and the types are
@@ -101,17 +81,6 @@ export function parseTargetId(id: string): ParseResult {
  * @param target - The target to render
  * @returns The canonical target ID string
  */
-/**
- * The axes a target's name is spelled from.
- *
- * Naming this is what removes a cast rather than relocating one. Spelling a
- * target reads three axis names and nothing else, so asking for a whole
- * `Target` demanded an `id` from the one caller whose reason for calling is to
- * compute that id. It supplied `"" as Target["id"]`, which is the fabricated
- * brand this package's own compile-fail fixture names as the hole it cannot
- * close from outside.
- */
-export type TargetAxes = Pick<Target, "runtime" | "platform" | "architecture">;
 
 export function stringifyTarget(target: TargetAxes): string {
   const parts: string[] = [target.runtime.name];
@@ -119,6 +88,3 @@ export function stringifyTarget(target: TargetAxes): string {
   if (target.architecture) parts.push(target.architecture.name);
   return parts.join("-");
 }
-
-/** Re-exported so callers can build capabilities without a second import. */
-export { capability };

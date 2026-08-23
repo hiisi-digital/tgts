@@ -74,8 +74,8 @@ for (const [fixture, mentions] of REFUSED) {
     assertStringIncludes(
       output,
       mentions,
-      `${fixture} was refused, but the diagnostic never mentions ${mentions}, so it may `
-        + "have been refused for an unrelated reason",
+      `${fixture} was refused, but the diagnostic never mentions ${mentions}, so it may ` +
+        "have been refused for an unrelated reason",
     );
   });
 }
