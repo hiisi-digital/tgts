@@ -141,7 +141,7 @@ export type TargetId = string & { readonly __brand: unique symbol };
  * runtime, platform or architecture this crate does not know.
  */
 /** What a target id decomposes into, when it is a valid one. */
-export interface TargetIdParts {
+interface TargetIdParts {
   readonly runtime: RuntimeName;
   readonly platform?: Platform;
   readonly architecture?: Architecture;
@@ -227,6 +227,17 @@ export function parseTargetIdParts(
   };
 }
 
+/**
+ * Mints a {@link TargetId} from a string, or refuses.
+ *
+ * The one door a branded id comes through. It parses the string into its axes
+ * first, so an id that reaches the type system is one this module built and
+ * agrees with, rather than any string a caller happened to cast.
+ *
+ * @param id the target id to validate, for example `deno-linux-x64`
+ * @returns the same string, branded
+ * @throws {InvalidTargetIdError} when the string is not a target id
+ */
 export function targetId(id: string): TargetId {
   const parsed = parseTargetIdParts(id);
   if (!parsed.ok) {
@@ -428,3 +439,28 @@ export class CapabilityNotSupportedError extends Error {
     this.targetId = targetId;
   }
 }
+
+/**
+ * What {@link parseTargetId} answers with.
+ *
+ * A discriminated union rather than one shape with two optional fields, so checking
+ * `success` narrows and a caller cannot reach for `target` on a failure or `error` on a
+ * success. The optional-fields form admitted `{ success: true }` carrying no target at all,
+ * which is a state the function never produces and every caller had to defend against with
+ * a non-null assertion.
+ */
+export type ParseResult =
+  | { readonly success: true; readonly target: Target; readonly error?: undefined }
+  | { readonly success: false; readonly target?: undefined; readonly error: string };
+
+/**
+ * The axes a target's name is spelled from.
+ *
+ * Naming this is what removes a cast rather than relocating one. Spelling a
+ * target reads three axis names and nothing else, so asking for a whole
+ * `Target` demanded an `id` from the one caller whose reason for calling is to
+ * compute that id. It supplied `"" as Target["id"]`, which is the fabricated
+ * brand this package's own compile-fail fixture names as the hole it cannot
+ * close from outside.
+ */
+export type TargetAxes = Pick<Target, "runtime" | "platform" | "architecture">;

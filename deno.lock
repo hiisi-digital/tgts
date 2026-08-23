@@ -29,6 +29,47 @@
     "dependencies": [
       "jsr:@std/assert@1",
       "jsr:@std/testing@1"
+<<<<<<< Updated upstream
     ]
+||||||| Stash base
+    ],
+    "links": {
+      "jsr:@hiisi/onlywhen@0.7.0": {
+        "dependencies": [
+          "jsr:@hiisi/tgts@0.2",
+          "jsr:@std/assert@1",
+          "jsr:@std/path@1",
+          "jsr:@std/testing@1"
+        ]
+      },
+      "jsr:@hiisi/shimp@0.1.0": {
+        "dependencies": [
+          "jsr:@hiisi/onlywhen@0.7",
+          "jsr:@std/assert@1",
+          "jsr:@std/testing@1"
+        ]
+      }
+    }
+=======
+    ],
+    "links": {
+      "jsr:@hiisi/onlywhen@0.7.0": {
+        "dependencies": [
+          "jsr:@hiisi/tgts@0.2",
+          "jsr:@std/assert@1",
+          "jsr:@std/path@1",
+          "jsr:@std/testing@1"
+        ]
+      },
+      "jsr:@hiisi/shimp@0.1.0": {
+        "dependencies": [
+          "jsr:@hiisi/cfg-ts@0.1",
+          "jsr:@hiisi/onlywhen@0.7",
+          "jsr:@std/assert@1",
+          "jsr:@std/testing@1"
+        ]
+      }
+    }
+>>>>>>> Stashed changes
   }
 }
