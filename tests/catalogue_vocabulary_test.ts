@@ -22,6 +22,21 @@ import { stringifyTarget } from "../src/parse.ts";
 import { targetId } from "../src/types.ts";
 import { ARCHITECTURES, PLATFORMS, RUNTIMES } from "../src/types.ts";
 
+/**
+ * Why a value fails its axis, in one shape.
+ *
+ * The three vocabulary laws below say the same thing about three axes, and
+ * saying it three times is how the wording drifts between them.
+ */
+function notInVocabulary(
+  id: string,
+  axis: string,
+  value: string,
+  names: readonly string[],
+): string {
+  return `${id} declares ${axis} "${value}", which is not one of ${names.join(", ")}`;
+}
+
 const targets = allTargets;
 
 Deno.test("the catalogue is not empty, so the laws below quantify over something", () => {
@@ -53,7 +68,7 @@ Deno.test("every target's runtime is a runtime this package knows", () => {
     if (target.runtime === undefined) continue;
     assert(
       names.includes(target.runtime),
-      `${target.id} declares runtime "${target.runtime}", which is not one of ${names.join(", ")}`,
+      notInVocabulary(target.id, "runtime", target.runtime, names),
     );
   }
 });
@@ -64,9 +79,7 @@ Deno.test("every target's platform is a platform this package knows", () => {
     if (target.platform === undefined) continue;
     assert(
       names.includes(target.platform),
-      `${target.id} declares platform "${target.platform}", which is not one of ${
-        names.join(", ")
-      }`,
+      notInVocabulary(target.id, "platform", target.platform, names),
     );
   }
 });
@@ -77,9 +90,7 @@ Deno.test("every target's architecture is an architecture this package knows", (
     if (target.architecture === undefined) continue;
     assert(
       names.includes(target.architecture),
-      `${target.id} declares architecture "${target.architecture}", which is not one of ${
-        names.join(", ")
-      }`,
+      notInVocabulary(target.id, "architecture", target.architecture, names),
     );
   }
 });
