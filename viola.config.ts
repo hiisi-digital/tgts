@@ -30,6 +30,26 @@ export default viola()
   // lint asks for a review rather than asserting a fault. Reviewed: one gives
   // back a branded id and the other the axes it is spelled from, the names say
   // which is which, and shortening either would say less.
+  // This package's whole subject is the vocabulary of runtimes, platforms and
+  // architectures, so its tests are full of the literals that name them. The
+  // lint's advice is to extract a constant, and taking it here would make each
+  // test compare the code to itself: `assertEquals(target.runtime, RUNTIMES.node)`
+  // passes whatever `RUNTIMES.node` is changed to. The literal is the assertion.
+  .set("duplicate-strings", {
+    ignoreStrings: [
+      "webgpu",
+      "linux",
+      "node",
+      "deno",
+      "bun",
+      "browser",
+      "platform",
+      "architecture",
+      "runtime",
+      "piped",
+      '", which is not one of "',
+    ],
+  })
   .set("similar-functions", {
     ignoreFunctions: [
       // .set replaces rather than merges, so the default that excludes
