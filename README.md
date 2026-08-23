@@ -25,7 +25,7 @@ filled in, match one against a pattern, ask whether a capability is present, or 
 you're currently running on.
 
 That's all it does, on purpose. It has no opinion about your build and doesn't run anything.
-It's the vocabulary the packages that *do* run things share, so that `@hiisi/cfg-ts` and
+It's the vocabulary the packages that _do_ run things share, so that `@hiisi/cfg-ts` and
 `@hiisi/otso` mean the same thing by "node-linux-x64" without either of them owning the
 definition.
 
@@ -70,13 +70,13 @@ const here = detectRuntime();
 
 ## What belongs elsewhere
 
-`tgts` answers what a *target* can do, statically, at build time. Three sibling packages answer
+`tgts` answers what a _target_ can do, statically, at build time. Three sibling packages answer
 neighbouring questions and it's worth knowing which one you actually want:
 
 [`@hiisi/onlywhen`](https://jsr.io/@hiisi/onlywhen) asks which runtime you are on right now and
 lets you branch on it, at runtime or stripped out at build time.
 
-[`@hiisi/shimp`](https://jsr.io/@hiisi/shimp) asks what *this running process* is allowed to do,
+[`@hiisi/shimp`](https://jsr.io/@hiisi/shimp) asks what _this running process_ is allowed to do,
 which under deno is a permission grant and is a different question from what the target
 supports in principle.
 

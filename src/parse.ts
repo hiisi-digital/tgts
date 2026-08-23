@@ -14,11 +14,14 @@ import {
   RUNTIMES,
   targetId,
 } from "./types.ts";
-import type { Architecture, Platform, RuntimeName, Target,
+import type {
+  Architecture,
   ParseResult,
+  Platform,
+  RuntimeName,
+  Target,
   TargetAxes,
 } from "./types.ts";
-
 
 /** Every runtime name the type union admits, as a value the runtime can test against. */
 // The vocabularies live beside the types they define, in types.ts, and the types are
@@ -99,4 +102,3 @@ export function stringifyTarget(target: TargetAxes): string {
   if (target.architecture) parts.push(target.architecture.name);
   return parts.join("-");
 }
-

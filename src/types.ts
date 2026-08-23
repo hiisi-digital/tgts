@@ -108,7 +108,6 @@ export function isValidArchitecture(name: string): name is Architecture {
   return (ARCHITECTURES as readonly string[]).includes(name);
 }
 
-
 /**
  * Architecture definition.
  */
@@ -142,8 +141,7 @@ export type TargetId = string & { readonly __brand: unique symbol };
  */
 /** What a target id decomposes into, when it is a valid one. */
 /** How a malformed id is described, so the messages below cannot drift apart. */
-const namesTwice = (id: string, axis: string): string =>
-  `target id "${id}" names two ${axis}s`;
+const namesTwice = (id: string, axis: string): string => `target id "${id}" names two ${axis}s`;
 
 interface TargetIdParts {
   readonly runtime: RuntimeName;
