@@ -18,21 +18,23 @@
  * target type could ever hold, so `"dneo" as RuntimeName` type-checked inside
  * the module that defines what a runtime is.
  *
- * The subprocess goes through `@hiisi/shimp` rather than one runtime's own
- * namespace, because this package builds for three of them and a test that runs
- * under one is a test that stops being run.
+ * This file is the one place in this package that reaches for a runtime's own
+ * namespace, and it does so deliberately. The packages plan puts `tgts` at the
+ * foundation with no dependencies inside this ecosystem, so it may not take
+ * `@hiisi/shimp` to abstract the subprocess: doing that made every package that
+ * links `tgts` need to link `shimp` behind it, which is a cost the foundation
+ * has no business imposing.
  *
- * That means the foundation depends on a package that transitively depends back
- * on it, and that is fine: a mutual cycle type-checks and publishes clean, and a
- * published version is a different instance from the one linked on disk. The
- * alternative was reaching for `Deno.*` here, which is the exact leak `shimp`
- * exists to remove, in the package everything else is built on.
+ * What is being spawned is a type checker, which is a toolchain rather than a
+ * runtime capability, and none of this ships: tests are outside
+ * `publish.include`. When the cross-runtime matrix arrives this file is the one
+ * that needs a per-runtime answer, and it will get one from the matrix rather
+ * than from a dependency here.
  *
  * @module
  */
 
 import { assert, assertStringIncludes } from "@std/assert";
-import { execPath, run } from "@hiisi/shimp";
 
 // resolved through URLs rather than through a path package, because this one
 // declares few dependencies and a test harness is not a reason to add another.
@@ -42,12 +44,14 @@ const FIXTURES = new URL("compile_fail/", HERE);
 
 /** Type-check one fixture, and report whether it compiled and what was said. */
 async function check(fixture: string): Promise<{ ok: boolean; output: string }> {
-  const result = await run(
-    execPath(),
-    ["check", new URL(fixture, FIXTURES).pathname],
-    { cwd: REPO.pathname },
-  );
-  return { ok: result.success, output: result.stdout + result.stderr };
+  const { success, stdout, stderr } = await new Deno.Command(Deno.execPath(), {
+    args: ["check", new URL(fixture, FIXTURES).pathname],
+    cwd: REPO.pathname,
+    stdout: "piped",
+    stderr: "piped",
+  }).output();
+  const decode = new TextDecoder();
+  return { ok: success, output: decode.decode(stdout) + decode.decode(stderr) };
 }
 
 /**
