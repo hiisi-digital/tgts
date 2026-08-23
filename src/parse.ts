@@ -6,22 +6,8 @@
  * @module
  */
 
-import {
-  ARCHITECTURES,
-  capability,
-  parseTargetIdParts,
-  PLATFORMS,
-  RUNTIMES,
-  targetId,
-} from "./types.ts";
-import type {
-  Architecture,
-  ParseResult,
-  Platform,
-  RuntimeName,
-  Target,
-  TargetAxes,
-} from "./types.ts";
+import { parseTargetIdParts, targetId } from "./types.ts";
+import type { ParseResult, TargetAxes } from "./types.ts";
 
 /** Every runtime name the type union admits, as a value the runtime can test against. */
 // The vocabularies live beside the types they define, in types.ts, and the types are
